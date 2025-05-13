@@ -49,19 +49,11 @@ for k in k_values:
 
 # Step 6: Visualization
 colors = {'Class1': 'blue', 'Class2': 'red'}  # Color mapping for classes
-fig, ax = plt.subplots(figsize=(10, 5))  # Create a figure
-
-# Plot training points at y=0
-ax.scatter(x[:50], [0]*50, c=[colors[l] for l in y_train], label='Training Points')
-
-# Plot test points for each k at y=k
+plt.scatter(x[:50], [0]*50, c=[colors[c] for c in y_train], label='Train')
 for k in k_values:
-    ax.scatter(x[50:], [k]*50, c=[colors[l] for l in results[k]], label=f'k={k}')
-
-ax.set_yticks([0] + k_values)  # Set y-ticks for clarity
-ax.set_xlabel("x values")  # Label x-axis
-ax.set_title("k-NN Classification Results")  # Title
-ax.legend()  # Show legend
-plt.grid(True)  # Show grid
-plt.tight_layout()  # Adjust layout
-plt.show()  # Display plot
+    plt.scatter(x[50:], [k]*50, c=[colors[c] for c in results[k]], label=f'k={k}')
+plt.yticks([0]+k_values)
+plt.xlabel("x")
+plt.title("k-NN Results")
+plt.legend()
+plt.show()
