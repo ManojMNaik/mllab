@@ -39,25 +39,43 @@ def LRC():
 
 # Polynomial Regression on Auto MPG dataset
 def PRAM():
+    import urllib.request
+
     url = "https://archive.ics.uci.edu/ml/machine-learning-databases/auto-mpg/auto-mpg.data"
     column_names = ["mpg", "cylinders", "displacement", "horsepower", "weight",
-                    "acceleration", "model year", "origin", "car name"]
+                    "acceleration", "model_year", "origin", "car_name"]
 
-    data = pd.read_csv(url, names=column_names, na_values='?', sep='\s+', engine='python')
+    # Download and decode lines
+    response = urllib.request.urlopen(url)
+    lines = [line.decode("utf-8").strip() for line in response.readlines()]
+
+    rows = []
+    for line in lines:
+        parts = line.split(maxsplit=8)
+        if len(parts) == 9:
+            rows.append(parts)
+
+    # Create DataFrame
+    data = pd.DataFrame(rows, columns=column_names)
+
+    # Convert numeric columns
+    for col in column_names[:-1]:
+        data[col] = pd.to_numeric(data[col], errors="coerce")
+
     data = data.dropna()
 
-    X = data["displacement"].values.reshape(-1, 1)
+    x = data["displacement"].values.reshape(-1, 1)
     y = data["mpg"].values
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
     model = make_pipeline(PolynomialFeatures(degree=2), StandardScaler(), LinearRegression())
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
 
     # Plot
-    plt.scatter(X_test, y_test, color="blue", label="Actual")
-    plt.scatter(X_test, y_pred, color="red", label="Predicted")
+    plt.scatter(x_test, y_test, color="blue", label="Actual")
+    plt.scatter(x_test, y_pred, color="red", label="Predicted")
     plt.xlabel("Displacement")
     plt.ylabel("Miles Per Gallon (MPG)")
     plt.title("Polynomial Regression - Auto MPG")
@@ -70,7 +88,7 @@ def PRAM():
     print("R^2 Score:", r2_score(y_test, y_pred))
 
 
-if __name__ == "__main__":
-    print("Demonstrating Linear and Polynomial Regression")
-    LRC()
-    PRAM()
+# Main execution
+print("Demonstrating Linear and Polynomial Regression")
+LRC()
+PRAM()
